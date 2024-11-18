@@ -45,7 +45,7 @@ def calculate_distances(coffee_data, user_location):
             'name': coffee_shop['Name'],
             'latitude': coordinates[1],
             'longitude': coordinates[0],
-            'distance': distance.distance(user_location, (coordinates[0], coordinates[1])).km
+            'distance': distance.distance((user_location[1], user_location[0]),(coordinates[1], coordinates[0])).km
         }
         nearby_coffee_shops.append(coffee_info)
     return nearby_coffee_shops
@@ -60,15 +60,17 @@ def find_nearest_coffee_shops(coffee_shops, count=5):
 
 
 def create_coffee_map(nearest_coffee_shops, user_location, map_filename="index.html"):
-    latitude, longitude = user_location
-    m = folium.Map(location=[longitude, latitude], zoom_start=15)
+    lon, lat = user_location
+    m = folium.Map(location=[lat, lon], zoom_start=15)
+
     # Метка пользователя
     folium.Marker(
-        location=[longitude, latitude],
+        location=[lat, lon],
         tooltip='Вы здесь',
-        popup=f'{latitude} {longitude}',
-        icon=folium.Icon(color="red"),
+        popup=f'{lat}, {lon}',
+        icon=folium.Icon(icon="user", color="red"),
     ).add_to(m)
+
     # Метки кафе
     for coffee_shop in nearest_coffee_shops:
         folium.Marker(
@@ -77,6 +79,7 @@ def create_coffee_map(nearest_coffee_shops, user_location, map_filename="index.h
             popup=f"{coffee_shop['name']} — {round(coffee_shop['distance'], 2)} км",
             icon=folium.Icon(color="blue"),
         ).add_to(m)
+
     m.save(map_filename)
 
 
